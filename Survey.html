@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Survey Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f7fa;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .survey-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      margin-bottom: 15px;
+    }
+
+    .question label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .question input[type="text"],
+    .question input[type="number"],
+    .question input[type="email"],
+    .question select,
+    .question textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .question input[type="radio"],
+    .question input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="survey-container">
+  <h2>📋 Personal Info & Interests Survey</h2>
+  <form action="#" method="POST">
+
+    <div class="question"><label>1. Full Name</label><input type="text" name="name" required></div>
+
+    <div class="question"><label>2. Email</label><input type="email" name="email"></div>
+
+    <div class="question"><label>3. Age</label><input type="number" name="age" min="1"></div>
+
+    <div class="question"><label>4. Gender</label>
+      <label><input type="radio" name="gender" value="Male"> Male</label>
+      <label><input type="radio" name="gender" value="Female"> Female</label>
+      <label><input type="radio" name="gender" value="Other"> Other</label>
+    </div>
+
+    <div class="question"><label>5. Country</label><input type="text" name="country"></div>
+
+    <div class="question"><label>6. Language(s) You Speak</label><input type="text" name="languages"></div>
+
+    <div class="question"><label>7. Are you a student?</label>
+      <label><input type="radio" name="student" value="Yes"> Yes</label>
+      <label><input type="radio" name="student" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>8. Education Level</label>
+      <select name="education">
+        <option value="Primary">Primary</option>
+        <option value="Middle">Middle</option>
+        <option value="High School">High School</option>
+        <option value="College">College</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="question"><label>9. Favorite Subject</label><input type="text" name="subject"></div>
+
+    <div class="question"><label>10. Do you like reading books?</label>
+      <label><input type="radio" name="read_books" value="Yes"> Yes</label>
+      <label><input type="radio" name="read_books" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>11. Hobbies</label><input type="text" name="hobbies"></div>
+
+    <div class="question"><label>12. How many hours a day do you use a computer?</label><input type="number" name="pc_hours"></div>
+
+    <div class="question"><label>13. Do you play games?</label>
+      <label><input type="radio" name="games" value="Yes"> Yes</label>
+      <label><input type="radio" name="games" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>14. Favorite Game</label><input type="text" name="fav_game"></div>
+
+    <div class="question"><label>15. Do you know programming?</label>
+      <label><input type="radio" name="programming" value="Yes"> Yes</label>
+      <label><input type="radio" name="programming" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>16. Programming Languages You Know</label><input type="text" name="code_languages"></div>
+
+    <div class="question"><label>17. Experience in Years (coding or working)</label><input type="number" name="experience_years"></div>
+
+    <div class="question"><label>18. Are you interested in AI or robots?</label>
+      <label><input type="radio" name="ai_interest" value="Yes"> Yes</label>
+      <label><input type="radio" name="ai_interest" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>19. Favorite Website</label><input type="text" name="fav_website"></div>
+
+    <div class="question"><label>20. Do you like teamwork?</label>
+      <label><input type="radio" name="teamwork" value="Yes"> Yes</label>
+      <label><input type="radio" name="teamwork" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>21. Do you want to start a business?</label>
+      <label><input type="radio" name="business" value="Yes"> Yes</label>
+      <label><input type="radio" name="business" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>22. Favorite Color</label><input type="text" name="fav_color"></div>
+
+    <div class="question"><label>23. Are you creative?</label>
+      <label><input type="radio" name="creative" value="Yes"> Yes</label>
+      <label><input type="radio" name="creative" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>24. Do you use YouTube for learning?</label>
+      <label><input type="radio" name="yt_learning" value="Yes"> Yes</label>
+      <label><input type="radio" name="yt_learning" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>25. Do you want to go viral?</label>
+      <label><input type="radio" name="viral" value="Yes"> Yes</label>
+      <label><input type="radio" name="viral" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>26. Do you have a personal website?</label>
+      <label><input type="radio" name="has_website" value="Yes"> Yes</label>
+      <label><input type="radio" name="has_website" value="No"> No</label>
+    </div>
+
+    <div class="question"><label>27. Website URL (if yes)</label><input type="text" name="website_url"></div>
+
+    <div class="question"><label>28. Your future dream?</label><input type="text" name="dream"></div>
+
+    <div class="question"><label>29. Any projects you are working on?</label><textarea name="projects" rows="3"></textarea></div>
+
+    <div class="question"><label>30. Anything you want to share?</label><textarea name="comments" rows="3"></textarea></div>
+
+    <button type="submit">Submit Survey</button>
+  </form>
+</div>
+
+</body>
+</html>
