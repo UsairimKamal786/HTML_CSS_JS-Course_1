@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Primary Math Quiz</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .quiz-container {
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .question label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .question input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h2>🧮 Primary Math Quiz – 10 Questions</h2>
+  <form id="quizForm">
+
+    <div class="question"><label>1. What is 5 + 3?</label><input type="text" name="q1"></div>
+    <div class="question"><label>2. What is 9 - 4?</label><input type="text" name="q2"></div>
+    <div class="question"><label>3. What is 6 × 2?</label><input type="text" name="q3"></div>
+    <div class="question"><label>4. What is 12 ÷ 3?</label><input type="text" name="q4"></div>
+    <div class="question"><label>5. What is 7 + 6?</label><input type="text" name="q5"></div>
+    <div class="question"><label>6. What is 15 - 7?</label><input type="text" name="q6"></div>
+    <div class="question"><label>7. What is 3 × 4?</label><input type="text" name="q7"></div>
+    <div class="question"><label>8. What is 18 ÷ 6?</label><input type="text" name="q8"></div>
+    <div class="question"><label>9. What is 10 + 9?</label><input type="text" name="q9"></div>
+    <div class="question"><label>10. What is 20 - 11?</label><input type="text" name="q10"></div>
+
+    <button type="submit">Check Answers</button>
+  </form>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  document.getElementById("quizForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const answers = {
+      q1: "8",
+      q2: "5",
+      q3: "12",
+      q4: "4",
+      q5: "13",
+      q6: "8",
+      q7: "12",
+      q8: "3",
+      q9: "19",
+      q10: "9"
+    };
+
+    let score = 0;
+
+    for (let key in answers) {
+      const userAnswer = document.querySelector(`input[name="${key}"]`).value.trim();
+      if (userAnswer === answers[key]) {
+        score++;
+      }
+    }
+
+    document.getElementById("result").textContent = `✅ You got ${score} out of 10 correct!`;
+  });
+</script>
+
+</body>
+</html>
