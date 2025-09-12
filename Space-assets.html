@@ -1,0 +1,225 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Space Assets — GitHub Progress Badge</title>
+  <style>
+    /* --- Basic layout --- */
+    :root{
+      --bg:#071025; /* deep space */
+      --panel:#0b2236;
+      --accent:#7ad3ff;
+      --glow:#9df0ff66;
+      --gold:#ffd166;
+      --glass: rgba(255,255,255,0.06);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:radial-gradient(circle at 20% 10%, #0b3250 0%, var(--bg) 50%);color:#e6f0ff}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+    .card{width:980px;max-width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:16px;padding:20px;box-shadow:0 8px 30px rgba(5,10,20,0.7);position:relative;overflow:hidden}/* starfield */
+.stars, .stars:after{position:absolute;inset:0;content:"";background-repeat:repeat;background-size:contain;pointer-events:none}
+.stars{background-image:radial-gradient(#ffffff22 0.8px, transparent 1px);opacity:0.85;transform:scale(1.4)}
+.stars:after{background-image:radial-gradient(#ffffff44 0.6px, transparent 1px);opacity:0.6;transform:translateY(200px)}
+
+header{display:flex;gap:16px;align-items:center}
+.logo{width:74px;height:74px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#6ee7b7);display:flex;align-items:center;justify-content:center;color:#012;box-shadow:0 6px 18px var(--glow);font-weight:800}
+h1{font-size:20px;margin:0}
+p.lead{margin:0;color:#bfe9ffcc}
+
+.grid{display:grid;grid-template-columns:360px 1fr;gap:18px;margin-top:18px}
+
+/* left panel */
+.panel{background:linear-gradient(180deg,var(--panel), rgba(255,255,255,0.02));padding:16px;border-radius:12px}
+.big-num{font-size:42px;font-weight:800;margin:6px 0}
+.small{color:#bcdff9;font-size:13px}
+
+.controls{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+input[type=text], input[type=number]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+.btn{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#8affc1);color:#012;font-weight:700;cursor:pointer}
+.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfeeff}
+
+/* progress */
+.progress-wrap{margin-top:14px}
+.bar{height:18px;background:var(--glass);border-radius:999px;overflow:hidden}
+.bar > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#ffd700);box-shadow:0 6px 18px rgba(255,209,102,0.12)}
+.milestones{display:flex;justify-content:space-between;font-size:12px;color:#bde9ff88;margin-top:6px}
+
+/* right panel — card list */
+.right{display:flex;flex-direction:column;gap:12px}
+.card-item{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;display:flex;align-items:center;gap:12px}
+.avatar{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#ffffff11,#00000011);display:flex;align-items:center;justify-content:center;font-weight:700}
+.meta{flex:1}
+.meta h4{margin:0;font-size:15px}
+.meta p{margin:2px 0 0 0;color:#cfeeff88;font-size:13px}
+
+footer{display:flex;gap:8px;align-items:center;margin-top:12px}
+
+/* rocket */
+.rocket{position:absolute;right:-60px;top:-30px;width:260px;opacity:0.9;transform:rotate(-12deg)}
+.rocket svg{filter:drop-shadow(0 8px 30px rgba(0,0,0,0.6))}
+
+/* responsive */
+@media (max-width:880px){.grid{grid-template-columns:1fr}.rocket{display:none}}
+
+/* playful micro animations */
+.sparkle{animation:twinkle 3s infinite}
+@keyframes twinkle{0%{opacity:0.3}50%{opacity:1}100%{opacity:0.3}}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="application" aria-label="Space GitHub Assets">
+      <div class="stars" aria-hidden="true"></div><header>
+    <div class="logo">✦</div>
+    <div>
+      <h1>Space Assets — GitHub Progress Badge</h1>
+      <p class="lead">A tiny interactive page to track your GitHub contributions like cosmic coins.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="panel" aria-live="polite">
+      <div class="small">Username</div>
+      <div class="big-num" id="displayName">UsairimKamal786</div>
+      <div class="small">Rank: <span id="displayRank">#187</span> · Contributions: <strong id="displayContribs">167</strong></div>
+
+      <div class="controls">
+        <label class="small">Change username</label>
+        <input type="text" id="username" placeholder="Type GitHub username" value="UsairimKamal786">
+
+        <label class="small">Contributions (public)</label>
+        <input type="number" id="contribs" min="0" value="167">
+
+        <label class="small">Rank</label>
+        <input type="number" id="rank" min="1" value="187">
+
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn" id="updateBtn">Update</button>
+          <button class="btn secondary" id="randomBoost">Quick Boost +5 commits</button>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="small">Progress to target rank</div>
+          <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+          <div class="milestones">
+            <span>Top 200</span>
+            <span>Top 150</span>
+            <span>Top 100</span>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <button class="btn secondary" id="saveBtn">Download as HTML</button>
+        <div style="flex:1"></div>
+        <div class="small">Made for <strong>Usairim</strong> ✨</div>
+      </footer>
+    </div>
+
+    <div class="right">
+      <div class="card-item">
+        <div class="avatar">UK</div>
+        <div class="meta">
+          <h4>GitHub Profile</h4>
+          <p id="metaLine">Rank #187 · 167 contributions</p>
+        </div>
+        <div class="small">Progress</div>
+      </div>
+
+      <div class="card-item">
+        <div class="avatar">🚀</div>
+        <div class="meta">
+          <h4>Mission: Top 150</h4>
+          <p>Get to ~220 contributions to crack Top 150. Keep the streak!</p>
+        </div>
+        <div class="small">Target</div>
+      </div>
+
+      <div class="card-item">
+        <div class="avatar">⭐</div>
+        <div class="meta">
+          <h4>Pro tip</h4>
+          <p>Make meaningful commits: small fixes + tiny projects = steady growth.</p>
+        </div>
+        <div class="small">Advice</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- rocket SVG -->
+  <div class="rocket" aria-hidden="true">
+    <svg width="360" height="360" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <path d="M477.5 34.5C442-1 375.6-7.2 311.3 23.6c-19.2 9.8-38 22.6-53.6 38.2L80 240c-2.3 2.2-3.7 5.4-3.7 8.7v114c0 6.6 5.4 12 12 12h114c3.3 0 6.5-1.4 8.7-3.7L450.2 254c15.6-15.6 28.4-34.4 38.2-53.6 30.7-64.3 24.6-130.7-11-165.9z" fill="url(#g1)"/>
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1">
+            <stop offset="0%" stop-color="#7ad3ff"/>
+            <stop offset="100%" stop-color="#6ee7b7"/>
+          </linearGradient>
+        </defs>
+      </g>
+    </svg>
+  </div>
+
+</div>
+
+  </div>  <script>
+    // --- Tiny logic to update UI and compute progress targets ---
+    const usernameEl = document.getElementById('username');
+    const contribsEl = document.getElementById('contribs');
+    const rankEl = document.getElementById('rank');
+    const updateBtn = document.getElementById('updateBtn');
+    const randomBoost = document.getElementById('randomBoost');
+    const displayName = document.getElementById('displayName');
+    const displayRank = document.getElementById('displayRank');
+    const displayContribs = document.getElementById('displayContribs');
+    const metaLine = document.getElementById('metaLine');
+    const barFill = document.getElementById('barFill');
+    const saveBtn = document.getElementById('saveBtn');
+
+    // Targets (these reflect the data you shared)
+    const targets = { top200:200, top150:220, top100:314 };
+
+    function refresh(){
+      const name = usernameEl.value || 'You';
+      const contribs = Number(contribsEl.value) || 0;
+      const rank = Number(rankEl.value) || '—';
+
+      displayName.textContent = name;
+      displayRank.textContent = `#${rank}`;
+      displayContribs.textContent = contribs;
+      metaLine.textContent = `Rank #${rank} · ${contribs} contributions`;
+
+      // compute progress toward top100 (as a comfortable gauge)
+      const goal = targets.top100;
+      const pct = Math.min(100, Math.round((contribs / goal) * 100));
+      barFill.style.width = pct + '%';
+
+      // subtle color change when near target
+      if(pct >= 80) barFill.style.boxShadow = '0 6px 30px rgba(255,209,102,0.22)';
+      else barFill.style.boxShadow = 'none';
+    }
+
+    updateBtn.addEventListener('click', (e)=>{ e.preventDefault(); refresh(); });
+    randomBoost.addEventListener('click', ()=>{ contribsEl.value = Number(contribsEl.value) + 5; refresh(); });
+
+    // Download current page as an HTML file so you can share your project
+    saveBtn.addEventListener('click', ()=>{
+      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = (usernameEl.value || 'space-assets') + '.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // init
+    refresh();
+  </script></body>
+</html>
