@@ -1,0 +1,283 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Throw Ball — Target Practice</title>
+  <style>
+    :root{--bg:#0f1724;--panel:#0b1b2b;--accent:#7ad3ff;--hit:#7ee787;color:#e6f0ff}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071428,#0f1724);color:var(--color)}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+    .game{width:980px;max-width:100%;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6);position:relative}header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:18px;margin:0}
+.controls{display:flex;gap:8px;align-items:center}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:#cfeeff;cursor:pointer}
+
+.layout{display:flex;gap:12px;margin-top:12px}
+.left{width:640px;flex:1}
+.right{width:280px;max-width:35%;display:flex;flex-direction:column;gap:10px}
+
+canvas{width:100%;height:420px;background:linear-gradient(#06202b,#071426);border-radius:10px;display:block}
+.panel{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px}
+
+.info{display:flex;justify-content:space-between;align-items:center}
+.small{color:#bfe9ffcc;font-size:13px}
+
+progress{width:100%}
+
+.targets{display:flex;flex-direction:column;gap:8px}
+.target-item{display:flex;justify-content:space-between;align-items:center}
+
+footer{margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+
+@media (max-width:920px){.layout{flex-direction:column}.right{max-width:100%;width:100%}}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="game" role="application" aria-label="Throw Ball — Target Practice">
+      <header>
+        <div>
+          <h1>Throw Ball — Target Practice</h1>
+          <div class="small">Click and drag on the ball to set angle & power. Release to throw.</div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="newRound">New Round</button>
+          <button class="btn" id="resetScore">Reset Score</button>
+        </div>
+      </header><div class="layout">
+    <div class="left">
+      <canvas id="gameCanvas" width="960" height="420" role="img" aria-label="Game canvas"></canvas>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <div class="info"><div class="small">Score</div><div id="score" style="font-weight:800">0</div></div>
+        <div style="height:8px"></div>
+        <div class="info"><div class="small">Round</div><div id="round">1</div></div>
+        <div style="height:8px"></div>
+        <div class="small">Power</div>
+        <progress id="powerBar" value="0" max="100"></progress>
+        <div style="height:10px"></div>
+        <div class="small">Targets</div>
+        <div class="targets" id="targetList"></div>
+        <div style="height:10px"></div>
+        <div class="small">Tips</div>
+        <div class="small">Aim slightly above target for arc shots. Try a few warm-up throws.</div>
+      </div>
+
+      <div class="panel">
+        <div class="small">Controls</div>
+        <ul style="margin:8px 0 0 18px;color:#bfe9ffcc">
+          <li>Click & drag the ball (left side) to set direction and strength.</li>
+          <li>Release to launch. Hitting higher rings = more points.</li>
+          <li>New Round places new targets at random distances.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="small">Made for <strong>Usairim</strong> — throw like a comet.</div>
+    <div class="small">Have fun! ✨</div>
+  </footer>
+</div>
+
+  </div>  <script>
+    // Simple 2D physics throw game.
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width, H = canvas.height;
+
+    // Game state
+    let score = 0;
+    let round = 1;
+    const scoreEl = document.getElementById('score');
+    const roundEl = document.getElementById('round');
+    const powerBar = document.getElementById('powerBar');
+    const targetList = document.getElementById('targetList');
+
+    // Ball starting position
+    const ballStart = { x: 90, y: H - 70 };
+    const ballRadius = 14;
+    let ball = { x: ballStart.x, y: ballStart.y, vx:0, vy:0, moving:false };
+
+    // Physics
+    const gravity = 0.6; // pixels per frame^2
+    const friction = 0.995;
+
+    // Input
+    let dragging = false;
+    let dragStart = null;
+
+    // Targets — rings: center and rings with decreasing score
+    let targets = [];
+
+    function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+
+    function newRound(){
+      // create 3 targets at increasing distances
+      targets = [];
+      const baseY = H - 120;
+      for(let i=0;i<3;i++){
+        const x = rand(420 + i*120, 520 + i*150);
+        const y = baseY - rand(-20,40);
+        const r = rand(28,36);
+        targets.push({x,y,r,hit:false});
+      }
+      updateTargetList();
+      // reset ball
+      ball = { x: ballStart.x, y: ballStart.y, vx:0, vy:0, moving:false };
+      dragging = false; dragStart = null;
+      round++;
+      roundEl.textContent = Math.max(1, round-1);
+    }
+
+    function updateTargetList(){
+      targetList.innerHTML = '';
+      targets.forEach((t,idx)=>{
+        const div = document.createElement('div'); div.className='target-item';
+        div.innerHTML = `<div class="small">Target ${idx+1}</div><div class="small">Dist: ${Math.round(t.x - ballStart.x)}px</div>`;
+        targetList.appendChild(div);
+      });
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      // ground
+      ctx.fillStyle = '#06121a'; ctx.fillRect(0,H-60,W,60);
+
+      // draw targets
+      targets.forEach(t=>{
+        // rings: outer -> inner
+        const rings = [t.r, Math.round(t.r*0.66), Math.round(t.r*0.33)];
+        for(let i=0;i<rings.length;i++){
+          ctx.beginPath(); ctx.arc(t.x,t.y,rings[i],0,Math.PI*2);
+          ctx.fillStyle = i===2? (t.hit? '#7ee787' : '#ffd166') : 'rgba(255,255,255,0.02)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.stroke();
+        }
+      });
+
+      // slingshot / guide
+      ctx.beginPath(); ctx.moveTo(ballStart.x, ballStart.y);
+      ctx.lineTo(ballStart.x - 30, ballStart.y + 20); ctx.lineWidth=4; ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.stroke();
+
+      // draw ball (with shadow)
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI*2);
+      ctx.fillStyle = '#7ad3ff'; ctx.fill();
+      ctx.strokeStyle = '#0a2540'; ctx.lineWidth=2; ctx.stroke();
+
+      // dragging line
+      if(dragging && dragStart){
+        ctx.beginPath(); ctx.moveTo(ball.x, ball.y); ctx.lineTo(dragStart.x, dragStart.y); ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=2; ctx.stroke();
+      }
+
+      // HUD small text
+      ctx.fillStyle = '#bfe9ff'; ctx.font='12px sans-serif';
+      ctx.fillText('Score: ' + score, 16, 20);
+      ctx.fillText('Round: ' + Math.max(1, round-1), 16, 36);
+    }
+
+    function step(){
+      // physics update
+      if(ball.moving){
+        ball.vy += gravity;
+        ball.x += ball.vx; ball.y += ball.vy;
+        ball.vx *= friction; ball.vy *= 0.999;
+
+        // ground collision
+        if(ball.y + ballRadius > H - 60){
+          ball.y = H - 60 - ballRadius;
+          ball.vy *= -0.5; // bounce
+          ball.vx *= 0.7;
+          if(Math.abs(ball.vy) < 1) ball.vy = 0;
+          if(Math.abs(ball.vx) < 0.1) ball.vx = 0;
+          // stop if nearly still
+          if(Math.abs(ball.vx) < 0.2 && Math.abs(ball.vy) < 0.5){ ball.moving = false; }
+        }
+
+        // check targets
+        targets.forEach((t,idx)=>{
+          if(!t.hit){
+            const dx = ball.x - t.x; const dy = ball.y - t.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist < t.r){
+              // score depends on how close to center: inner most ring highest
+              const inner = Math.round(t.r*0.33);
+              if(dist < inner) score += 50; else if(dist < inner*2) score += 30; else score += 15;
+              t.hit = true;
+              // small pop
+              ball.vx *= 0.4; ball.vy *= 0.4;
+            }
+          }
+        });
+      }
+
+      // update power bar when dragging
+      if(dragging && dragStart){
+        const dx = dragStart.x - ball.x; const dy = dragStart.y - ball.y; const p = Math.min(100, Math.round(Math.sqrt(dx*dx+dy*dy)));
+        powerBar.value = p;
+      } else { powerBar.value = 0; }
+
+      draw();
+      requestAnimationFrame(step);
+    }
+
+    // Input handling — support touch & mouse
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      if(e.touches) e = e.touches[0];
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    canvas.addEventListener('mousedown', (ev)=>{
+      const p = getPos(ev);
+      const dx = p.x - ball.x; const dy = p.y - ball.y;
+      if(Math.sqrt(dx*dx+dy*dy) < ballRadius+6 && !ball.moving){
+        dragging = true; dragStart = p; }
+    });
+    canvas.addEventListener('mousemove', (ev)=>{
+      if(dragging){ dragStart = getPos(ev); }
+    });
+    canvas.addEventListener('mouseup', (ev)=>{
+      if(dragging){
+        const release = getPos(ev);
+        const dx = release.x - ball.x; const dy = release.y - ball.y;
+        // velocity is opposite the drag direction (pull back to launch forward)
+        const power = Math.min(120, Math.sqrt(dx*dx + dy*dy));
+        const angle = Math.atan2(dy, dx);
+        // convert to vx,vy — tuned constants
+        ball.vx = -Math.cos(angle) * (power * 0.4);
+        ball.vy = -Math.sin(angle) * (power * 0.45) - 6;
+        ball.moving = true;
+        dragging = false; dragStart = null;
+      }
+    });
+
+    // touch events
+    canvas.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); const p=getPos(ev); const dx=p.x-ball.x; const dy=p.y-ball.y; if(Math.sqrt(dx*dx+dy*dy)<ballRadius+8 && !ball.moving){ dragging=true; dragStart=p; } });
+    canvas.addEventListener('touchmove', (ev)=>{ ev.preventDefault(); if(dragging) dragStart=getPos(ev); });
+    canvas.addEventListener('touchend', (ev)=>{ ev.preventDefault(); if(dragging){ const release=dragStart; const dx = release.x - ball.x; const dy = release.y - ball.y; const power = Math.min(120, Math.sqrt(dx*dx + dy*dy)); const angle = Math.atan2(dy, dx); ball.vx = -Math.cos(angle) * (power * 0.4); ball.vy = -Math.sin(angle) * (power * 0.45) - 6; ball.moving = true; dragging=false; dragStart=null; } });
+
+    // buttons
+    document.getElementById('newRound').addEventListener('click', ()=>{ newRound(); });
+    document.getElementById('resetScore').addEventListener('click', ()=>{ score=0; scoreEl.textContent=score; });
+
+    // resize handling
+    window.addEventListener('resize', ()=>{
+      // keep logical canvas size but responsive drawing
+      // (we're using CSS-scaled canvas; drawing uses internal resolution)
+    });
+
+    // main loop update score display
+    setInterval(()=>{ scoreEl.textContent = score; }, 120);
+
+    // initial setup
+    newRound();
+    requestAnimationFrame(step);
+  </script></body>
+</html>
